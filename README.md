@@ -1,59 +1,152 @@
-# MyCars
+# My Cars - Car Management Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.9.
+A full-stack Angular application for managing your car collection with user authentication and CRUD operations.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- 🔐 **User Authentication**: Login and registration with JWT tokens
+- 🚗 **Car Management**: Add, view, edit, and delete cars
+- 👤 **User Profile**: Manage profile information and change password
+- 📱 **Responsive Design**: Works on desktop, tablet, and mobile devices
+- 🎨 **Modern UI**: Beautiful gradient design with smooth animations
+- 🔒 **Protected Routes**: Secure pages with authentication guards
 
+## Tech Stack
+
+### Frontend
+- **Angular 20.3**: Modern Angular with standalone components
+- **TypeScript**: Type-safe development
+- **RxJS**: Reactive programming
+- **ngx-toastr**: Toast notifications
+- **@auth0/angular-jwt**: JWT handling
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Backend API running on `http://localhost:8080`
+
+### Installation
+
+1. Install dependencies:
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2. Configure the API URL:
+   - Edit `src/app/services/auth.service.ts` and `src/app/services/car.service.ts`
+   - Update the `apiUrl` to match your backend server
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+3. Start the development server:
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+4. Open your browser and navigate to `http://localhost:4200`
 
-```bash
-ng generate --help
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── components/          # UI Components
+│   │   ├── home/           # Landing page
+│   │   ├── login/          # Login page
+│   │   ├── register/       # Registration page
+│   │   ├── navigation/     # Navigation bar
+│   │   ├── user-profile/   # User profile page
+│   │   ├── car-list/       # List of cars
+│   │   ├── car-detail/     # Car details page
+│   │   └── car-form/       # Add/Edit car form
+│   ├── services/           # Business logic
+│   │   ├── auth.service.ts # Authentication service
+│   │   └── car.service.ts  # Car management service
+│   ├── guards/             # Route guards
+│   │   └── auth.guard.ts   # Authentication guard
+│   ├── interceptors/       # HTTP interceptors
+│   │   └── auth.interceptor-interceptor.ts
+│   ├── models/             # TypeScript interfaces
+│   └── app.routes.ts       # Application routes
+└── styles.css              # Global styles
 ```
 
-## Building
+## Available Scripts
 
-To build the project run:
+- `npm start` - Start development server
+- `npm run build` - Build for production
+- `npm test` - Run unit tests
+- `npm run watch` - Build in watch mode
 
-```bash
-ng build
-```
+## Features Overview
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Authentication
+- User registration with validation
+- Secure login with JWT tokens
+- Token stored in localStorage
+- Auto-logout on token expiration
+- Protected routes with auth guard
 
-## Running unit tests
+### Car Management
+- View all your cars in a grid layout
+- Add new cars with brand, model, year, color, and image
+- Edit existing car information
+- Delete cars with confirmation
+- View detailed car information
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### User Profile
+- Update profile information (name, email)
+- Change password
+- View username and account details
 
-```bash
-ng test
-```
+## API Endpoints Expected
 
-## Running end-to-end tests
+The frontend expects the following backend API endpoints:
 
-For end-to-end (e2e) testing, run:
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `GET /api/auth/me` - Get current user
+- `POST /api/auth/change-password` - Change password
+- `PUT /api/auth/users/:id` - Update user profile
 
-```bash
-ng e2e
-```
+### Cars
+- `GET /api/cars` - Get all cars
+- `GET /api/cars/:id` - Get car by ID
+- `GET /api/cars/user/:userId` - Get user's cars
+- `POST /api/cars` - Create new car
+- `PUT /api/cars/:id` - Update car
+- `DELETE /api/cars/:id` - Delete car
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Design Features
 
-## Additional Resources
+- **Gradient Theme**: Purple/blue gradient throughout the app
+- **Card-based UI**: Modern card design for content
+- **Smooth Animations**: Hover effects and transitions
+- **Responsive Grid**: Adaptive layout for all screen sizes
+- **Toast Notifications**: User feedback for all actions
+- **Loading States**: Spinners and loading indicators
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Contact
+
+For any questions or issues, please open an issue on the repository.
+

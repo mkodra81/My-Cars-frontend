@@ -1,0 +1,254 @@
+<main class="p-8 min-h-screen bg-gray-50 text-gray-900">
+  <!-- Page Header -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold text-gray-700 uppercase mb-2 border-b border-gray-200 pb-2">
+      {{ isAdmin ? 'All Cars (Admin View)' : 'My Cars' }}
+    </h2>
+    <p class="text-gray-600 text-sm mb-4">
+      {{ isAdmin ? 'Manage all cars across all users.' : 'View and manage your personal cars.' }}
+    </p>
+  </section>
+
+  <!-- Cars List Section -->
+  <section class="mb-8">
+    <div class="space-y-4">
+      <div
+        *ngFor="let car of cars"
+        class="flex justify-between items-center bg-white shadow-sm border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+      >
+        <div>
+          <p class="font-semibold text-gray-800 text-base mb-2">
+            {{ car.brand }} {{ car.model }} ({{ car.year }})
+          </p>
+          <p class="text-gray-600 text-sm">Color: {{ car.color }}</p>
+          <p class="text-gray-600 text-sm mt-1">License: {{ car.license }}</p>
+          <p *ngIf="isAdmin && car.owner" class="text-gray-500 text-xs mt-1">
+            Owner: {{ getOwnerName(car) }}
+          </p>
+        </div>
+
+        <div class="flex space-x-2">
+          <button
+            (click)="editCar(car)"
+            class="bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
+          >
+            Edit
+          </button>
+          <button
+            (click)="deleteCar(car.id)"
+            class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <p *ngIf="cars.length === 0" class="text-sm text-gray-500 italic text-center py-8">
+        No cars found.
+      </p>
+    </div>
+  </section>
+
+  <!-- Add Car Button -->
+  <div class="w-full flex justify-end mb-6">
+    <button
+      *ngIf="!showAddForm"
+      (click)="toggleAddForm()"
+      class="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded transition"
+    >
+      Add Car
+    </button>
+  </div>
+
+  <!-- Add New Car Form -->
+  <section *ngIf="showAddForm" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 uppercase mb-4 border-b border-gray-200 pb-2">
+      Add New Car
+    </h2>
+    <form
+      [formGroup]="addCarForm"
+      (ngSubmit)="addCar()"
+      class="space-y-4 text-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Brand</label>
+          <input
+            type="text"
+            formControlName="brand"
+            placeholder="e.g., Toyota"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addCarForm.get('brand')?.invalid && addCarForm.get('brand')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Brand is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Model</label>
+          <input
+            type="text"
+            formControlName="model"
+            placeholder="e.g., Camry"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addCarForm.get('model')?.invalid && addCarForm.get('model')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Model is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">License</label>
+          <input
+            type="text"
+            formControlName="license"
+            placeholder="e.g., ABC-1234"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addCarForm.get('license')?.invalid && addCarForm.get('license')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            License is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Year</label>
+          <input
+            type="number"
+            formControlName="year"
+            placeholder="e.g., 2020"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addCarForm.get('year')?.invalid && addCarForm.get('year')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Valid year is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Color</label>
+          <input
+            type="text"
+            formControlName="color"
+            placeholder="e.g., Red"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addCarForm.get('color')?.invalid && addCarForm.get('color')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Color is required
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="submit"
+          [disabled]="addCarForm.invalid"
+          class="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add Car
+        </button>
+        <button
+          type="button"
+          (click)="toggleAddForm()"
+          class="bg-gray-400 hover:bg-gray-500 text-white text-sm font-semibold px-4 py-2 rounded transition"
+        >
+          Cancel
+        </button>
+        <p *ngIf="addSuccessMessage" class="text-green-600 text-sm">{{ addSuccessMessage }}</p>
+        <p *ngIf="addErrorMessage" class="text-red-500 text-sm">{{ addErrorMessage }}</p>
+      </div>
+    </form>
+  </section>
+
+  <!-- Edit Car Section -->
+  <section *ngIf="editingCar" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 uppercase mb-4 border-b border-gray-200 pb-2">
+      Edit Car - {{ editingCar.brand }} {{ editingCar.model }}
+    </h2>
+    <form
+      [formGroup]="editCarForm"
+      (ngSubmit)="updateCar()"
+      class="space-y-4 text-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Brand</label>
+          <input
+            type="text"
+            formControlName="brand"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Model</label>
+          <input
+            type="text"
+            formControlName="model"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">License</label>
+          <input
+            type="text"
+            formControlName="license"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Year</label>
+          <input
+            type="number"
+            formControlName="year"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Color</label>
+          <input
+            type="text"
+            formControlName="color"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="submit"
+          [disabled]="editCarForm.invalid"
+          class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Update Car
+        </button>
+        <button
+          type="button"
+          (click)="cancelEdit()"
+          class="bg-gray-400 hover:bg-gray-500 text-white text-sm font-semibold px-4 py-2 rounded transition"
+        >
+          Cancel
+        </button>
+        <p *ngIf="editSuccessMessage" class="text-green-600 text-sm">{{ editSuccessMessage }}</p>
+        <p *ngIf="editErrorMessage" class="text-red-500 text-sm">{{ editErrorMessage }}</p>
+      </div>
+    </form>
+  </section>
+</main>
+
