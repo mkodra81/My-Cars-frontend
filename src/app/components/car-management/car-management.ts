@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } 
 import { Subscription } from 'rxjs';
 import { CarService } from '../../services/car.service';
 import { AuthService } from '../../services/auth.service';
+import { AdminService } from '../../services/admin.service';
 import { Car } from '../../models/cars';
 import { User } from '../../models/user';
 
@@ -17,6 +18,7 @@ import { User } from '../../models/user';
 export class CarManagement implements OnInit, OnDestroy {
   cars: Car[] = [];
   filteredCars: Car[] = [];
+  users: User[] = [];
   currentUser: User | null = null;
   isAdmin = false;
 
@@ -37,7 +39,8 @@ export class CarManagement implements OnInit, OnDestroy {
 
   constructor(
     private carService: CarService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {
     this.addCarForm = new FormGroup({
       brand: new FormControl('', Validators.required),
@@ -45,6 +48,7 @@ export class CarManagement implements OnInit, OnDestroy {
       year: new FormControl('', [Validators.required, Validators.min(1900)]),
       license: new FormControl('', Validators.required),
       color: new FormControl('', Validators.required),
+      owner: new FormControl(''), // For admin to select owner
     });
 
     this.editCarForm = new FormGroup({
@@ -61,6 +65,17 @@ export class CarManagement implements OnInit, OnDestroy {
     const userSub = this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       this.isAdmin = user?.is_superuser || false;
+
+      // If admin, load users and make owner field required
+      if (this.isAdmin) {
+        this.adminService.loadUsers().subscribe({
+          next: (users) => {
+            this.users = users;
+          },
+          error: (err) => console.error('Failed to load users:', err)
+        });
+        this.addCarForm.get('owner')?.setValidators([Validators.required]);
+      }
 
       // Subscribe to cars$ observable first
       const carsSub = this.carService.cars$.subscribe((cars: Car[]) => {
@@ -93,24 +108,52 @@ export class CarManagement implements OnInit, OnDestroy {
   addCar() {
     if (this.addCarForm.invalid) return;
 
-    const carData = this.addCarForm.value;
+    const carData: any = {
+      brand: this.addCarForm.value.brand,
+      model: this.addCarForm.value.model,
+      year: this.addCarForm.value.year,
+      license: this.addCarForm.value.license,
+      color: this.addCarForm.value.color,
+    };
 
-    this.carService.addCar(carData).subscribe({
-      next: () => {
-        this.addSuccessMessage = 'Car added successfully!';
-        this.addErrorMessage = '';
-        this.addCarForm.reset();
-        setTimeout(() => {
+    // If admin, use the owner-specific endpoint
+    if (this.isAdmin && this.addCarForm.value.owner) {
+      const ownerId = Number(this.addCarForm.value.owner);
+      this.carService.addCarForOwner(ownerId, carData).subscribe({
+        next: () => {
+          this.addSuccessMessage = 'Car added successfully!';
+          this.addErrorMessage = '';
+          this.addCarForm.reset();
+          setTimeout(() => {
+            this.addSuccessMessage = '';
+            this.showAddForm = false;
+          }, 2000);
+        },
+        error: (err: any) => {
+          this.addErrorMessage = 'Failed to add car.';
           this.addSuccessMessage = '';
-          this.showAddForm = false;
-        }, 2000);
-      },
-      error: (err: any) => {
-        this.addErrorMessage = 'Failed to add car.';
-        this.addSuccessMessage = '';
-        console.error(err);
-      }
-    });
+          console.error(err);
+        }
+      });
+    } else {
+      // Regular user - use standard endpoint
+      this.carService.addCar(carData).subscribe({
+        next: () => {
+          this.addSuccessMessage = 'Car added successfully!';
+          this.addErrorMessage = '';
+          this.addCarForm.reset();
+          setTimeout(() => {
+            this.addSuccessMessage = '';
+            this.showAddForm = false;
+          }, 2000);
+        },
+        error: (err: any) => {
+          this.addErrorMessage = 'Failed to add car.';
+          this.addSuccessMessage = '';
+          console.error(err);
+        }
+      });
+    }
   }
 
   editCar(car: Car) {

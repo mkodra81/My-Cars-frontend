@@ -92,6 +92,26 @@
       class="space-y-4 text-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Owner Selection (Admin Only) -->
+        <div *ngIf="isAdmin" class="flex flex-col md:col-span-2">
+          <label class="mb-2 text-gray-700 font-medium">Owner *</label>
+          <select
+            formControlName="owner"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="">Select a user...</option>
+            <option *ngFor="let user of users" [value]="user.id">
+              {{ user.username }} - {{ user.first_name }} {{ user.last_name }}
+            </option>
+          </select>
+          <span
+            *ngIf="addCarForm.get('owner')?.invalid && addCarForm.get('owner')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Owner is required
+          </span>
+        </div>
+
         <div class="flex flex-col">
           <label class="mb-2 text-gray-700 font-medium">Brand</label>
           <input

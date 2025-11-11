@@ -36,6 +36,16 @@ export class CarService {
     );
   }
 
+  // Add new car for specific owner (admin only)
+  addCarForOwner(ownerId: number, newCar: Partial<Car>): Observable<Car> {
+    return this.http.post<Car>(`${this.apiUrl}owner/${ownerId}/`, newCar).pipe(
+      tap((car) => {
+        const updated = [...this.carsSubject.value, car];
+        this.carsSubject.next(updated);
+      })
+    );
+  }
+
   // Update car
   updateCar(carId: number, updatedCar: Partial<Car>): Observable<Car> {
     return this.http.put<Car>(`${this.apiUrl}${carId}/`, updatedCar).pipe(
