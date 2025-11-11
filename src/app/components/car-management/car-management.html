@@ -2,18 +2,39 @@
   <!-- Page Header -->
   <section class="mb-8">
     <h2 class="text-2xl font-semibold text-gray-700 uppercase mb-2 border-b border-gray-200 pb-2">
-      {{ isAdmin ? 'All Cars (Admin View)' : 'My Cars' }}
+      {{ (isAdmin ? 'All Cars (Admin View)' : 'My Cars') }}
     </h2>
     <p class="text-gray-600 text-sm mb-4">
-      {{ isAdmin ? 'Manage all cars across all users.' : 'View and manage your personal cars.' }}
+      {{ (isAdmin ? 'Manage all cars across all users.' : 'View and manage your personal cars.') }}
     </p>
+
+    <!-- Filter Section (visible only for admin) -->
+    <div *ngIf="isAdmin" class="mt-12 flex items-center gap-3">
+      <input
+        type="text"
+        [(ngModel)]="usernameFilter"
+        (input)="onFilterChange()"
+        placeholder="Filter by username..."
+        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+      />
+      <button
+        *ngIf="usernameFilter"
+        (click)="clearFilter()"
+        class="text-gray-500 hover:text-gray-700 text-sm font-medium transition"
+      >
+        ✕ Clear
+      </button>
+      <span class="text-gray-500 text-sm whitespace-nowrap">
+        {{ filteredCars.length }} / {{ cars.length }}
+      </span>
+    </div>
   </section>
 
   <!-- Cars List Section -->
   <section class="mb-8">
     <div class="space-y-4">
       <div
-        *ngFor="let car of cars"
+        *ngFor="let car of filteredCars"
         class="flex justify-between items-center bg-white shadow-sm border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
       >
         <div>
@@ -30,7 +51,7 @@
         <div class="flex space-x-2">
           <button
             (click)="editCar(car)"
-            class="bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
+            class="bg-blue-400 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
           >
             Edit
           </button>
@@ -43,7 +64,7 @@
         </div>
       </div>
 
-      <p *ngIf="cars.length === 0" class="text-sm text-gray-500 italic text-center py-8">
+      <p *ngIf="filteredCars.length === 0" class="text-sm text-gray-500 italic text-center py-8">
         No cars found.
       </p>
     </div>

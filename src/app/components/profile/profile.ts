@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./profile.css']
 })
 export class Profile implements OnInit {
+  userId: number = 0;
   username = '';
   firstName = '';
   lastName = '';
@@ -37,6 +38,7 @@ export class Profile implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       if (user) {
+        this.userId = user.id;
         this.username = user.username;
         this.firstName = user.first_name;
         this.lastName = user.last_name;
@@ -72,25 +74,17 @@ export class Profile implements OnInit {
     });
   }
 
-  logout() {
-    this.authService.logout();
-  }
-
   deleteAccount() {
     if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
 
-    this.authService.deleteAccount().subscribe({
-      next: () => {
-        this.deleteUserMessage = 'Account deleted successfully.';
-        setTimeout(
-          () => this.authService.logout(),
-          3000
-        )
-      },
-      error: (err) => {
-        console.error(err)
-        this.errorDeleteMessage = 'Failed to delete account.';
-      }
-    });
+    this.authService.deleteAccount(this.userId).subscribe().unsubscribe();
+    this.authService.logout();
+    this.deleteUserMessage = 'Your account has been deleted.';
+    setTimeout(
+      () => {
+        this.router.navigate(['/login']);
+      }, 100
+    )
+    this.deleteUserMessage = null;
   }
 }

@@ -1,1 +1,295 @@
-<p>users works!</p>
+<main class="p-8 min-h-screen bg-gray-50 text-gray-900">
+  <!-- Page Header -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold text-gray-700 uppercase mb-2 border-b border-gray-200 pb-2">
+      User Management
+    </h2>
+    <p class="text-gray-600 text-sm mb-4">
+      Manage all users in the system.
+    </p>
+  </section>
+
+  <!-- Users List Section -->
+  <section class="mb-8">
+    <div class="space-y-4">
+      <div
+        *ngFor="let user of users"
+        class="flex justify-between items-center bg-white shadow-sm border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+      >
+        <div>
+          <p class="font-semibold text-gray-800 text-base mb-2">
+            {{ user.first_name }} {{ user.last_name }}
+            <span *ngIf="user.is_superuser" class="ml-2 text-xs bg-purple-500 text-white px-2 py-1 rounded">
+              Admin
+            </span>
+          </p>
+          <p class="text-gray-600 text-sm">Username: {{ user.username }}</p>
+          <p class="text-gray-600 text-sm mt-1">Email: {{ user.email }}</p>
+          <p class="text-gray-500 text-xs mt-1">
+            Joined: {{ formatDate(user.date_joined) }}
+          </p>
+        </div>
+
+        <div class="flex space-x-2">
+
+          <button
+            (click)="editUser(user)"
+            class="bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
+          >
+            Edit
+          </button>
+          <button
+            (click)="deleteUser(user.id)"
+            class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded transition"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <p *ngIf="users.length === 0" class="text-sm text-gray-500 italic text-center py-8">
+        No users found.
+      </p>
+    </div>
+  </section>
+
+  <!-- Add User Button -->
+  <div class="w-full flex justify-end mb-6">
+    <button
+      *ngIf="!showAddForm"
+      (click)="toggleAddForm()"
+      class="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded transition"
+    >
+      Add User
+    </button>
+  </div>
+
+  <!-- Add New User Form -->
+  <section *ngIf="showAddForm" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 uppercase mb-4 border-b border-gray-200 pb-2">
+      Add New User
+    </h2>
+    <form
+      [formGroup]="addUserForm"
+      (ngSubmit)="addUser()"
+      class="space-y-4 text-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">First Name</label>
+          <input
+            type="text"
+            formControlName="first_name"
+            placeholder="e.g., John"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addUserForm.get('first_name')?.invalid && addUserForm.get('first_name')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            First name is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Last Name</label>
+          <input
+            type="text"
+            formControlName="last_name"
+            placeholder="e.g., Doe"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addUserForm.get('last_name')?.invalid && addUserForm.get('last_name')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Last name is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Username</label>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="e.g., johndoe"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addUserForm.get('username')?.invalid && addUserForm.get('username')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Username is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="e.g., john@example.com"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addUserForm.get('email')?.invalid && addUserForm.get('email')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Valid email is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Minimum 6 characters"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="addUserForm.get('password')?.invalid && addUserForm.get('password')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Password must be at least 6 characters
+          </span>
+        </div>
+
+        <div class="flex flex-col justify-center">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="is_superuser"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <span class="text-gray-700 font-medium">Admin User</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="submit"
+          [disabled]="addUserForm.invalid"
+          class="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add User
+        </button>
+        <button
+          type="button"
+          (click)="toggleAddForm()"
+          class="bg-gray-400 hover:bg-gray-500 text-white text-sm font-semibold px-4 py-2 rounded transition"
+        >
+          Cancel
+        </button>
+        <p *ngIf="addSuccessMessage" class="text-green-600 text-sm">{{ addSuccessMessage }}</p>
+        <p *ngIf="addErrorMessage" class="text-red-500 text-sm">{{ addErrorMessage }}</p>
+      </div>
+    </form>
+  </section>
+
+  <!-- Edit User Section -->
+  <section *ngIf="editingUser" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 uppercase mb-4 border-b border-gray-200 pb-2">
+      Edit User - {{ editingUser.username }}
+    </h2>
+    <form
+      [formGroup]="editUserForm"
+      (ngSubmit)="updateUser()"
+      class="space-y-4 text-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">First Name</label>
+          <input
+            type="text"
+            formControlName="first_name"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="editUserForm.get('first_name')?.invalid && editUserForm.get('first_name')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            First name is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Last Name</label>
+          <input
+            type="text"
+            formControlName="last_name"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="editUserForm.get('last_name')?.invalid && editUserForm.get('last_name')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Last name is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Username</label>
+          <input
+            type="text"
+            formControlName="username"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="editUserForm.get('username')?.invalid && editUserForm.get('username')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Username is required
+          </span>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-2 text-gray-700 font-medium">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <span
+            *ngIf="editUserForm.get('email')?.invalid && editUserForm.get('email')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Valid email is required
+          </span>
+        </div>
+
+        <div class="flex flex-col justify-center">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="is_superuser"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <span class="text-gray-700 font-medium">Admin User</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="submit"
+          [disabled]="editUserForm.invalid"
+          class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Update User
+        </button>
+        <button
+          type="button"
+          (click)="cancelEdit()"
+          class="bg-gray-400 hover:bg-gray-500 text-white text-sm font-semibold px-4 py-2 rounded transition"
+        >
+          Cancel
+        </button>
+        <p *ngIf="editSuccessMessage" class="text-green-600 text-sm">{{ editSuccessMessage }}</p>
+        <p *ngIf="editErrorMessage" class="text-red-500 text-sm">{{ editErrorMessage }}</p>
+      </div>
+    </form>
+  </section>
+</main>
+

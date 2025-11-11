@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { CarService } from '../../services/car.service';
 import { AuthService } from '../../services/auth.service';
@@ -10,14 +10,18 @@ import { User } from '../../models/user';
 @Component({
   selector: 'app-car-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './car-management.html',
   styleUrls: ['./car-management.css']
 })
 export class CarManagement implements OnInit, OnDestroy {
   cars: Car[] = [];
+  filteredCars: Car[] = [];
   currentUser: User | null = null;
   isAdmin = false;
+
+  // Filter property
+  usernameFilter: string = '';
 
   addCarForm: FormGroup;
   editCarForm: FormGroup;
@@ -58,12 +62,17 @@ export class CarManagement implements OnInit, OnDestroy {
       this.currentUser = user;
       this.isAdmin = user?.is_superuser || false;
 
-      // Load cars using CarService for all users
-      this.carService.loadCars();
+      // Subscribe to cars$ observable first
       const carsSub = this.carService.cars$.subscribe((cars: Car[]) => {
         this.cars = cars;
+        this.applyFilter();
       });
       this.subscriptions.push(carsSub);
+
+      // Load cars after subscribing - this triggers the HTTP request
+      this.carService.loadCars().subscribe({
+        error: (err) => console.error('Failed to load cars:', err)
+      });
     });
     this.subscriptions.push(userSub);
   }
@@ -160,5 +169,25 @@ export class CarManagement implements OnInit, OnDestroy {
 
   getOwnerName(car: Car): string {
     return car.owner
+  }
+
+  applyFilter() {
+    if (!this.usernameFilter.trim()) {
+      this.filteredCars = this.cars;
+    } else {
+      const filterLower = this.usernameFilter.toLowerCase().trim();
+      this.filteredCars = this.cars.filter(car =>
+        car.owner && car.owner.toLowerCase().includes(filterLower)
+      );
+    }
+  }
+
+  onFilterChange() {
+    this.applyFilter();
+  }
+
+  clearFilter() {
+    this.usernameFilter = '';
+    this.applyFilter();
   }
 }

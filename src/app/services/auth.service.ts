@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -59,7 +59,7 @@ export class AuthService {
     email: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/register/`, userData);
+    return this.http.post(`${this.baseUrl}/users/`, userData);
   }
 
   /** Logout user */
@@ -68,7 +68,7 @@ export class AuthService {
     localStorage.removeItem('refresh');
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
-    this.router.navigate(['/login']);
+
   }
 
   /** Helpers */
@@ -83,7 +83,7 @@ export class AuthService {
     });
   }
 
-  deleteAccount(): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete-account/`);
+  deleteAccount(userId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/users/${userId}/`);
   }
 }

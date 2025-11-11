@@ -18,13 +18,12 @@ export class CarService {
   constructor(private http: HttpClient) {}
 
   // Fetch all cars from backend
-  loadCars() {
-    this.http.get<Car[]>(this.apiUrl).subscribe({
-      next: (cars) => {
-        this.carsSubject.next(cars)
-      },
-      error: (err) => console.error('Failed to load cars:', err)
-    });
+  loadCars(): Observable<Car[]> {
+    return this.http.get<Car[]>(this.apiUrl).pipe(
+      tap((cars) => {
+        this.carsSubject.next(cars);
+      })
+    );
   }
 
   // Add new car

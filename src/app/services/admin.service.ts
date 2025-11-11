@@ -21,14 +21,14 @@ export class AdminService {
 
   // Load all users
   loadUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/admin/users/`).pipe(
+    return this.http.get<User[]>(`${this.baseUrl}/users/`).pipe(
       tap((users) => this.usersSubject.next(users))
     );
   }
 
   // Get a single user by ID
   getUserById(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/admin/users/${userId}/`);
+    return this.http.get<User>(`${this.baseUrl}/users/${userId}/`);
   }
 
   // Create a new user
@@ -40,7 +40,7 @@ export class AdminService {
     password: string;
     is_superuser?: boolean;
   }): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/admin/users/`, userData).pipe(
+    return this.http.post<User>(`${this.baseUrl}/users/`, userData).pipe(
       tap((user) => {
         const updated = [...this.usersSubject.value, user];
         this.usersSubject.next(updated);
@@ -50,10 +50,10 @@ export class AdminService {
 
   // Update an existing user
   updateUser(userId: number, userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/admin/users/${userId}/`, userData).pipe(
+    return this.http.put<User>(`${this.baseUrl}/users/${userId}/`, userData).pipe(
       tap((updatedUser) => {
         const updated = this.usersSubject.value.map((u) =>
-          u.userId === updatedUser.userId ? updatedUser : u
+          u.id === updatedUser.id ? updatedUser : u
         );
         this.usersSubject.next(updated);
       })
@@ -62,9 +62,9 @@ export class AdminService {
 
   // Delete a user
   deleteUser(userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/admin/users/${userId}/`).pipe(
+    return this.http.delete<void>(`${this.baseUrl}/users/${userId}/`).pipe(
       tap(() => {
-        const updated = this.usersSubject.value.filter((u) => u.userId !== userId);
+        const updated = this.usersSubject.value.filter((u) => u.id !== userId);
         this.usersSubject.next(updated);
       })
     );

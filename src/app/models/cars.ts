@@ -8,4 +8,5 @@ export interface Car {
   model: string;
   license: string;
   owner: string;
+  owner_id?: number;
 }

@@ -5,8 +5,7 @@ import { Register } from './pages/register/register';
 import { Dashboard } from './components/dashboard/dashboard';
 import { Layout } from './pages/layout/layout';
 import { AdminDashboard } from './components/admin.dashboard/admin.dashboard';
-import { Cars } from './components/cars/cars';
-import { UserCars } from './components/user-cars/user-cars';
+import { CarManagement} from './components/car-management/car-management';
 import { Profile } from './components/profile/profile';
 import { Users } from './components/users/users';
 
@@ -40,7 +39,7 @@ export const routes: Routes = [
           },
           {
             path: 'cars',
-            component: Cars
+            component: CarManagement
           },
           {
             path: 'profile',
@@ -67,7 +66,7 @@ export const routes: Routes = [
           },
           {
             path: 'cars',
-            component: Cars
+            component: CarManagement
           }
         ]
       }
