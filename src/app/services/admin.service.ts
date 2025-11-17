@@ -14,21 +14,14 @@ export class AdminService {
   private usersSubject = new BehaviorSubject<User[]>([]);
   users$ = this.usersSubject.asObservable();
 
-
   constructor(private http: HttpClient) {}
 
-  /** ========== USER MANAGEMENT ========== */
 
   // Load all users
   loadUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/users/`).pipe(
       tap((users) => this.usersSubject.next(users))
     );
-  }
-
-  // Get a single user by ID
-  getUserById(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/users/${userId}/`);
   }
 
   // Create a new user

@@ -15,9 +15,6 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
-  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
-
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('access');
     if (token) {
@@ -25,17 +22,16 @@ export class AuthService {
     }
   }
 
-  /** Load current user info */
+  // Load current user info
   loadCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.baseUrl}/me/`).pipe(
       tap((user) => {
         this.currentUserSubject.next(user);
-        this.isAuthenticatedSubject.next(true);
       })
     );
   }
 
-  /** Login and store tokens */
+  // Login and store tokens
   login(credentials: {
     username: string;
     password: string;
@@ -62,16 +58,13 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/users/`, userData);
   }
 
-  /** Logout user */
+  // Logout user
   logout(): void {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     this.currentUserSubject.next(null);
-    this.isAuthenticatedSubject.next(false);
-
   }
 
-  /** Helpers */
   isAuthenticated(): boolean {
     return !!localStorage.getItem('access');
   }
