@@ -2,8 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
-import { Car } from '../models/cars';
+import { Car, CarDetails } from '../models/cars';
 import { environment } from '../../environments/environment';
+
+export interface CarCreatePayload {
+  car_details: CarDetails;
+  license: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +32,8 @@ export class CarService {
   }
 
   // Add new car
-  addCar(newCar: Partial<Car>): Observable<Car> {
-    return this.http.post<Car>(this.apiUrl, newCar).pipe(
+  addCar(carData: CarCreatePayload): Observable<Car> {
+    return this.http.post<Car>(this.apiUrl, carData).pipe(
       tap((car) => {
         const updated = [...this.carsSubject.value, car];
         this.carsSubject.next(updated);
@@ -37,8 +42,8 @@ export class CarService {
   }
 
   // Add new car for specific owner (admin only)
-  addCarForOwner(ownerId: number, newCar: Partial<Car>): Observable<Car> {
-    return this.http.post<Car>(`${this.apiUrl}owner/${ownerId}/`, newCar).pipe(
+  addCarForOwner(ownerId: number, carData: CarCreatePayload): Observable<Car> {
+    return this.http.post<Car>(`${this.apiUrl}owner/${ownerId}/`, carData).pipe(
       tap((car) => {
         const updated = [...this.carsSubject.value, car];
         this.carsSubject.next(updated);
@@ -47,8 +52,8 @@ export class CarService {
   }
 
   // Update car
-  updateCar(carId: number, updatedCar: Partial<Car>): Observable<Car> {
-    return this.http.put<Car>(`${this.apiUrl}${carId}/`, updatedCar).pipe(
+  updateCar(carId: number, carData: CarCreatePayload): Observable<Car> {
+    return this.http.put<Car>(`${this.apiUrl}${carId}/`, carData).pipe(
       tap((car) => {
         const updated = this.carsSubject.value.map((c) =>
           c.id  === car.id ? car : c

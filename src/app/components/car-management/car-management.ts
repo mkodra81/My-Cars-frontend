@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { CarService } from '../../services/car.service';
+import { CarService, CarCreatePayload } from '../../services/car.service';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { Car } from '../../models/cars';
@@ -108,12 +108,14 @@ export class CarManagement implements OnInit, OnDestroy {
   addCar() {
     if (this.addCarForm.invalid) return;
 
-    const carData: any = {
-      brand: this.addCarForm.value.brand,
-      model: this.addCarForm.value.model,
-      year: this.addCarForm.value.year,
+    const carData: CarCreatePayload = {
+      car_details: {
+        brand: this.addCarForm.value.brand,
+        model: this.addCarForm.value.model,
+        year: this.addCarForm.value.year,
+        color: this.addCarForm.value.color,
+      },
       license: this.addCarForm.value.license,
-      color: this.addCarForm.value.color,
     };
 
     // If admin, use the owner-specific endpoint
@@ -159,11 +161,11 @@ export class CarManagement implements OnInit, OnDestroy {
   editCar(car: Car) {
     this.editingCar = car;
     this.editCarForm.patchValue({
-      brand: car.brand,
-      model: car.model,
-      year: car.year,
+      brand: car.car_details.brand,
+      model: car.car_details.model,
+      year: car.car_details.year,
       license: car.license,
-      color: car.color
+      color: car.car_details.color || ''
     });
     this.editSuccessMessage = '';
     this.editErrorMessage = '';
@@ -172,9 +174,17 @@ export class CarManagement implements OnInit, OnDestroy {
   updateCar() {
     if (this.editCarForm.invalid || !this.editingCar) return;
 
-    const updatedData = this.editCarForm.value;
+    const carData: CarCreatePayload = {
+      car_details: {
+        brand: this.editCarForm.value.brand,
+        model: this.editCarForm.value.model,
+        year: this.editCarForm.value.year,
+        color: this.editCarForm.value.color,
+      },
+      license: this.editCarForm.value.license,
+    };
 
-    this.carService.updateCar(this.editingCar.id, updatedData).subscribe({
+    this.carService.updateCar(this.editingCar.id, carData).subscribe({
       next: () => {
         this.editSuccessMessage = 'Car updated successfully!';
         this.editErrorMessage = '';
@@ -211,7 +221,7 @@ export class CarManagement implements OnInit, OnDestroy {
   }
 
   getOwnerName(car: Car): string {
-    return car.owner
+    return car.owner_username || car.owner_name || `User #${car.owner}`;
   }
 
   applyFilter() {
@@ -219,9 +229,10 @@ export class CarManagement implements OnInit, OnDestroy {
       this.filteredCars = this.cars;
     } else {
       const filterLower = this.usernameFilter.toLowerCase().trim();
-      this.filteredCars = this.cars.filter(car =>
-        car.owner && car.owner.toLowerCase().includes(filterLower)
-      );
+      this.filteredCars = this.cars.filter(car => {
+        const ownerName = this.getOwnerName(car).toLowerCase();
+        return ownerName.includes(filterLower);
+      });
     }
   }
 

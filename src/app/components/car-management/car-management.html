@@ -39,11 +39,11 @@
       >
         <div>
           <p class="font-semibold text-gray-800 text-base mb-2">
-            {{ car.brand }} {{ car.model }} ({{ car.year }})
+            {{ car.car_details.brand }} {{ car.car_details.model }} ({{ car.car_details.year }})
           </p>
-          <p class="text-gray-600 text-sm">Color: {{ car.color }}</p>
+          <p class="text-gray-600 text-sm">Color: {{ car.car_details.color || 'N/A' }}</p>
           <p class="text-gray-600 text-sm mt-1">License: {{ car.license }}</p>
-          <p *ngIf="isAdmin && car.owner" class="text-gray-500 text-xs mt-1">
+          <p *ngIf="isAdmin" class="text-gray-500 text-xs mt-1">
             Owner: {{ getOwnerName(car) }}
           </p>
         </div>
@@ -217,7 +217,7 @@
   <!-- Edit Car Section -->
   <section *ngIf="editingCar" class="mb-8">
     <h2 class="text-lg font-semibold text-gray-700 uppercase mb-4 border-b border-gray-200 pb-2">
-      Edit Car - {{ editingCar.brand }} {{ editingCar.model }}
+      Edit Car - {{ editingCar.car_details.brand }} {{ editingCar.car_details.model }}
     </h2>
     <form
       [formGroup]="editCarForm"
