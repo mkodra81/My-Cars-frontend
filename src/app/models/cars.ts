@@ -8,9 +8,9 @@ export interface CarDetails {
 
 export interface Car {
   id: number;
-  owner: number;  // owner ID
-  owner_username?: string;  // for display purposes
-  owner_name?: string;  // for display purposes
+  owner: number;
+  owner_username?: string;
+  owner_name?: string;
   car_details: CarDetails;
   license: string;
   created_at?: string;

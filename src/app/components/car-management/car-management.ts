@@ -221,7 +221,7 @@ export class CarManagement implements OnInit, OnDestroy {
   }
 
   getOwnerName(car: Car): string {
-    return car.owner_username || car.owner_name || `User #${car.owner}`;
+    return `User #${car.owner}`;
   }
 
   applyFilter() {
